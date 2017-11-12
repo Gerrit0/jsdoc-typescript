@@ -1,0 +1,21 @@
+{
+  "name": "jsdoc-typescript",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@types/node": "^8.0.51",
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.1"
+  },
+  "peerDependencies": {
+    "jsdoc": ">3.0.0",
+    "typescript": ">2.0.0"
+  },
+  "scripts": {
+    "build": "tsc"
+  }
+}
