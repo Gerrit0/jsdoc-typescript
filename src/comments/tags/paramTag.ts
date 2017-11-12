@@ -1,5 +1,5 @@
 import * as ts from 'typescript'
-import { getName, getTypeFromSyntaxKind } from '../../utils'
+import { getName, getType } from '../../utils'
 
 export default function createParamTag(node: ts.Node, tag: ts.JSDocPropertyLikeTag): string {
   if (!ts.isFunctionLike(node)) {
@@ -37,8 +37,8 @@ export default function createParamTag(node: ts.Node, tag: ts.JSDocPropertyLikeT
 }
 
 let type = '?'
-const tagType = tag.typeExpression ? getTypeFromSyntaxKind(tag.typeExpression.type) : '?'
-const paramType = param.type ? getTypeFromSyntaxKind(param.type) : '?'
+const tagType = tag.typeExpression ? getType(tag.typeExpression.type) : '?'
+const paramType = param.type ? getType(param.type) : '?'
 
 if (tagType == '?') type = paramType
 else if (paramType == '?') type = tagType

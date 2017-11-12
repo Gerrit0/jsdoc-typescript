@@ -1,14 +1,34 @@
 import * as ts from 'typescript'
 import { SyntaxKind, TypeNode, TypeElement } from 'typescript'
 
+interface iLogger {
+  warn(message: string): void
+  error(message: string): void
+  fatal(message: string): void
+}
+
 /**
 * The JSDoc logger provided for extensions
 * @see http://usejsdoc.org/about-plugins.html#reporting-errors
 */
-export const Logger = require('jsdoc/util/logger') as {
-  warn(message: string): void,
-  error(message: string): void,
-  fatal(message: string): void,
+let jsDocLogger: iLogger
+try {
+  jsDocLogger = require('jsdoc/util/logger')
+} catch {}
+
+export const Logger = {
+  warn(message: string) {
+    if (jsDocLogger) jsDocLogger.warn(message)
+    else console.warn(message)
+  },
+  error(message: string) {
+    if (jsDocLogger) jsDocLogger.error(message)
+    else console.error(message)
+  },
+  fatal(message: string) {
+    if (jsDocLogger) jsDocLogger.fatal(message)
+    else console.error('Fatal', message)
+  }
 }
 
 /**
@@ -56,21 +76,41 @@ export function hasJSDoc<T extends ts.Node>(node: T): node is HasJSDoc & T {
 }
 
 const typeMap = new Map<SyntaxKind, string>([
+  [SyntaxKind.NullKeyword, 'null'],
   [SyntaxKind.VoidKeyword, 'void'],
   [SyntaxKind.AnyKeyword, '*'],
+  [SyntaxKind.NeverKeyword, 'never'],
+  [SyntaxKind.ObjectKeyword, 'object'],
   [SyntaxKind.NumberKeyword, 'number'],
   [SyntaxKind.StringKeyword, 'string'],
+  [SyntaxKind.UndefinedKeyword, 'undefined'],
   [SyntaxKind.FunctionDeclaration, 'function'],
-]);
+])
 
-export function getTypeFromSyntaxKind(node: TypeNode | TypeElement | undefined): string {
+export function getType(node: TypeNode | TypeElement | undefined): string {
   if (!node) return '?'
 
-  if (ts.isTypeReferenceNode(node)) {
-    return `${getName(node.typeName)}`
+  const primitiveType = typeMap.get(node.kind)
+  if (primitiveType) return primitiveType
+
+  if (ts.isTypeReferenceNode(node)) return `${getName(node.typeName)}`
+
+  if (ts.isUnionTypeNode(node)) return node.types.map(getType).join(' | ')
+
+  if (ts.isIntersectionTypeNode(node)) return node.types.map(getType).join(' & ')
+
+  if (ts.isTypeLiteralNode(node)) {
+    return `{ ${node.members.map(getType).join(', ')} }`
   }
 
-  return typeMap.get(node.kind) || '?'
+  if (ts.isPropertySignature(node)) {
+    // Within TypeLiteral
+    if (!ts.isIdentifier(node.name)) return '?'
+    return `${node.name.text}: ${node.questionToken ? '?' : ''}${getType(node.type)}`
+  }
+
+  console.log('Unknown type', ts.SyntaxKind[node.kind], node)
+  return '?'
 }
 
 export function createDocComment(lines: string[]): string {

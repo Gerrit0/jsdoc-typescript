@@ -10,10 +10,6 @@
       true,
       "never"
     ],
-    "cyclomatic-complexity": [
-      true,
-      10
-    ],
     "no-invalid-this": [
       true,
       "check-function-in-method"

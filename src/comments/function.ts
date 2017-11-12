@@ -1,5 +1,5 @@
 import * as ts from 'typescript'
-import { hasJSDoc, getName, createDocComment, getComments, getTags, Logger } from '../utils'
+import { hasJSDoc, getName, getComments, getTags, Logger } from '../utils'
 
 import createParamTag from './tags/paramTag'
 import createReturnTag from './tags/returnTag'
@@ -7,12 +7,12 @@ import createGenericTag from './tags/genericTag'
 
 // TODO: If a param is not documented with @param it will be lost.
 
-export default function getCommentForFunction(node: ts.FunctionLike, namespace: string[]): string {
-  if (!hasJSDoc(node)) return ''
+export default function getCommentForFunction(node: ts.FunctionLike): string[] {
+  if (!hasJSDoc(node)) return []
 
   if (!node.name || !ts.isIdentifier(node.name)) {
     Logger.warn('Non identifier for function name. Not sure how to handle. Skipping.')
-    return ''
+    return []
   }
 
   const lines: string[] = [
@@ -21,26 +21,24 @@ export default function getCommentForFunction(node: ts.FunctionLike, namespace: 
     `@name ${getName(node.name)}`
   ]
 
-  if (namespace.length) lines.push(`@memberof ${namespace.join('.')}`)
-
   let hasReturn = false
 
   for (let tag of getTags(node)) {
     switch (tag.tagName.text) {
       case 'param':
       lines.push(createParamTag(node, tag))
-      break;
+        break
       case 'return':
       hasReturn = true
       lines.push(createReturnTag(node, tag))
-      break;
+        break
       default:
       lines.push(createGenericTag(tag))
-      break;
+        break
     }
   }
 
   if (!hasReturn) lines.push(createReturnTag(node))
 
-  return createDocComment(lines)
+  return lines
 }

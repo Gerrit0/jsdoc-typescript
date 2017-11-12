@@ -1,22 +1,15 @@
 import * as ts from 'typescript'
-import { getComments, HasJSDoc, createDocComment, getTags, hasJSDoc, Logger, getTypeFromSyntaxKind } from '../utils'
-import createGenericTag from './tags/genericTag';
+import { getComments, HasJSDoc, getTags, hasJSDoc, Logger, getType } from '../utils'
+import createGenericTag from './tags/genericTag'
 
-export default function createCommentFromInterface(node: ts.InterfaceDeclaration & HasJSDoc, namespace: string[]): string {
+export default function createCommentFromInterface(node: ts.InterfaceDeclaration & HasJSDoc): string[] {
   const lines: string[] = [
     ...getComments(node),
     ...getTags(node).map(createGenericTag)
   ]
   lines.push(`@typedef {Object} ${node.name.text}`)
 
-  if (namespace.length) lines.push(`@memberof ${namespace.join('.')}`)
-
   for (const member of node.members) {
-    if (!hasJSDoc(member)) {
-      Logger.warn(`Member of ${node.name.text} is missing documentation.`)
-      continue
-    }
-
     if (!member.name || !ts.isIdentifier(member.name)) {
       Logger.warn('Unknown type of member identifier')
       continue
@@ -29,15 +22,15 @@ export default function createCommentFromInterface(node: ts.InterfaceDeclaration
       continue
     }
 
-    const type = getTypeFromSyntaxKind(member.type)
-    const comment = getComments(member).join(' ')
+    const type = getType(member.type)
+    const comment = hasJSDoc(member) ? getComments(member).join(' ') : ''
 
     if (member.questionToken) {
       name = `[${name}]`
     }
 
-    lines.push(`@property {${type}} ${name} - ${comment}`)
+    lines.push(`@property {${type}} ${name} ${comment ? `- ${comment}` : ''}`)
   }
 
-  return createDocComment(lines)
+  return lines
 }

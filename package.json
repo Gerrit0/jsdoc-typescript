@@ -8,14 +8,15 @@
   ],
   "devDependencies": {
     "@types/node": "^8.0.51",
+    "ava": "^0.23.0",
     "tslint": "^5.8.0",
     "typescript": "^2.6.1"
   },
   "peerDependencies": {
-    "jsdoc": ">3.0.0",
     "typescript": ">2.0.0"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "ava"
   }
 }

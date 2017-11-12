@@ -1,19 +1,42 @@
 import * as ts from 'typescript'
-import { hasJSDoc, pluck, Logger } from '../utils';
+import { hasJSDoc, pluck, Logger } from '../utils'
 
-import getCommentForFunction from './function'
-import getCommentForInterface from './interface'
+interface TypeHandler<HandledType extends ts.Node> {
+  test(node: ts.Node): node is HandledType
+  handle(node: HandledType): string[]
+}
+
+const types: TypeHandler<ts.Node>[] = []
+
+const createComment = (node: ts.Node) => {
+  for (const { test, handle } of types) {
+    if (test(node)) return handle(node)
+  }
+  Logger.warn(`Documenting ${ts.SyntaxKind[node.kind]} is not yet supported.`)
+  return []
+}
+
+import createCommentForFunction from './function'
+types.push( { test: ts.isFunctionLike, handle: createCommentForFunction })
+
+import createCommentForInterface from './interface'
+types.push({ test: ts.isInterfaceDeclaration, handle: createCommentForInterface })
+
 import createCommentForModule from './module'
+types.push({ test: ts.isModuleDeclaration, handle: createCommentForModule })
+
+import createCommentForType from './type'
+types.push({ test: ts.isTypeAliasDeclaration, handle: createCommentForType })
 
 
-export default function getComments(source: ts.SourceFile): string[] {
-  const comments: string[] = []
+export default function getComments(source: ts.SourceFile): string[][] {
+  const comments: string[][] = []
   const printer = ts.createPrinter()
 
   let namespace: string[] = []
 
+  //tslint:disable-next-line:cyclomatic-complexity
   const documentNode = (node: ts.Node) => {
-    // console.log(ts.SyntaxKind[node.kind], hasJSDoc(node) ? '- Has JSDoc' : '')
 
     // If this is a module block, recurse to get exported items.
     if (ts.isModuleDeclaration(node)) {
@@ -25,7 +48,7 @@ export default function getComments(source: ts.SourceFile): string[] {
     }
 
     // Only process exported nodes
-    if (!node.modifiers || pluck(node.modifiers, 'kind').indexOf(ts.SyntaxKind.ExportKeyword) == -1) {
+    if (!node.modifiers || !pluck(node.modifiers, 'kind').includes(ts.SyntaxKind.ExportKeyword)) {
       return
     }
 
@@ -33,18 +56,9 @@ export default function getComments(source: ts.SourceFile): string[] {
     if (!hasJSDoc(node)) return
 
     try {
-      if (ts.isFunctionLike(node)) {
-        const comment = getCommentForFunction(node, namespace)
-        if (comment) comments.push(comment)
-      } else if (ts.isModuleDeclaration(node)) {
-        const comment = createCommentForModule(node, namespace)
-        if (comment) comments.push(comment)
-      } else if (ts.isInterfaceDeclaration(node)) {
-        const comment = getCommentForInterface(node, namespace)
-        if (comment) comments.push(comment)
-      } else {
-        Logger.warn(`Documenting ${ts.SyntaxKind[node.kind]} is not yet supported.`)
-      }
+      const comment = createComment(node)
+      if (namespace.length) comment.push(`@memberof ${namespace.join('.')}`)
+      comments.push(comment)
     } catch (error) {
       Logger.error(
         'Error:\n' +

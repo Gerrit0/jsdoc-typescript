@@ -1,5 +1,5 @@
 import * as ts from 'typescript'
-import { getTypeFromSyntaxKind, Logger } from '../../utils'
+import { getType, Logger } from '../../utils'
 
 /**
 * Creates an @return for the provided function
@@ -9,8 +9,8 @@ import { getTypeFromSyntaxKind, Logger } from '../../utils'
 */
 export default function createReturnTag(node: ts.FunctionLike, tag?: ts.JSDocPropertyLikeTag): string {
   let type = '?'
-  let docType = tag && tag.typeExpression ? getTypeFromSyntaxKind(tag.typeExpression.type) : '?'
-  let codeType = getTypeFromSyntaxKind(node.type)
+  let docType = tag && tag.typeExpression ? getType(tag.typeExpression.type) : '?'
+  let codeType = getType(node.type)
 
   if (docType == '?') type = codeType
   else if (codeType == '?') type = docType
@@ -21,5 +21,5 @@ export default function createReturnTag(node: ts.FunctionLike, tag?: ts.JSDocPro
     type = codeType
   }
 
-  return `@return {${type}} ${tag ? tag.comment : ''}`
+  return `@return {${type}} ${tag ? `- ${tag.comment}` : ''}`
 }
