@@ -1,7 +1,6 @@
 import * as ts from 'typescript'
 import { getComments, HasJSDoc, getTags, getType } from '../utils'
 import createGenericTag from './tags/genericTag'
-import createFunctionComment from './function'
 
 // Literal types and type references are considered "simple"
 function isSimpleType(node: ts.Node): boolean {

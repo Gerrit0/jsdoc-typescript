@@ -4,7 +4,6 @@ import { getName, getComments, getTags, Logger, HasJSDoc } from '../utils'
 import createParamTag from './tags/paramTag'
 import createReturnTag from './tags/returnTag'
 import createGenericTag from './tags/genericTag'
-import { createParameter } from 'typescript';
 
 // TODO: If a param is not documented with @param it will be lost.
 
@@ -19,8 +18,6 @@ export default function getCommentForFunction(node: ts.FunctionLike & HasJSDoc):
     '@function',
     `@name ${getName(node.name)}`
   ]
-
-  let hasReturn = false
 
   for (let tag of getTags(node)) {
     switch (tag.tagName.text) {
