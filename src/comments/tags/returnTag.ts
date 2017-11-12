@@ -21,5 +21,5 @@ export default function createReturnTag(node: ts.FunctionLike, tag?: ts.JSDocPro
     type = codeType
   }
 
-  return `@return {${type}} ${tag ? `- ${tag.comment}` : ''}`
+  return `@return {${type}} ${tag && tag.comment ? `- ${tag.comment}` : ''}`
 }

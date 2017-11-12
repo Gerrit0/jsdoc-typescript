@@ -24,7 +24,6 @@ export default function createCommentFromType(node: ts.TypeAliasDeclaration & Ha
   }
   // Function - typedef takesString = (a: string) => void
   else if (ts.isFunctionTypeNode(node.type)) {
-    // See http://usejsdoc.org/tags-callback.html
     lines.push(`@callback ${node.name.text}`)
     node.type.parameters.forEach(param => {
       if (!ts.isIdentifier(param.name)) {

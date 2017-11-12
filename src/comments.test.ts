@@ -39,20 +39,8 @@ function assertSimilarDocs(t: TestContext, result: string[][], expected: string[
     const expectedTags = expectedComment.slice(i)
     const actualTags = comment.slice(i)
 
-    let lastOrderedIndex = 0
-    expectedTags.forEach(tag => {
-      if (tag.startsWith('@param') || tag.startsWith('@property')) {
-        lastOrderedIndex = actualTags.indexOf(tag, lastOrderedIndex)
-        t.true(lastOrderedIndex > -1, `Missing tag: ${tag}`)
-      } else {
-        // To provide a nicer error message, assume only one of this type of tag
-        const name = tag.substring(0, tag.indexOf(' '))
-        const actualTag = actualTags.find(tag => tag.startsWith(name))
-        if (!actualTag) {
-          t.fail(`Failed to find a tag to match ${tag}`)
-        }
-        t.is(tag, actualTag)
-      }
+    expectedTags.forEach((tag, tagIndex) => {
+      t.is(actualTags[tagIndex], tag)
     })
 
   })
@@ -186,15 +174,15 @@ test(`@namespace results in @memberof tags`, t => {
       'A function two deep',
       '@function',
       '@name c',
-      '@memberof A.B',
       '@return {number}',
+      '@memberof A.B',
     ],
     [
       'A function one deep',
       '@function',
       '@name d',
+      '@return {number}',
       '@memberof A',
-      '@return {number}'
     ]
   ])
 })
@@ -339,6 +327,71 @@ test(`@callback for function types`, t => {
       'A function accepting a string',
       '@callback strFunc',
       '@param {string} a'
+    ]
+  ])
+})
+
+test(`Complex function parameter types`, t => {
+  const comments = toComments(`
+    /**
+     * A function with a default object
+     * @param obj
+     */
+    export function case1(obj: { a: string} = { a: 'hi' }): void {
+      console.log(obj.a)
+    }
+  `)
+
+  assertSimilarDocs(t, comments, [
+    [
+      'A function with a default object',
+      '@function',
+      '@name case1',
+      '@param {{ a: string }} [obj = { a: "hi" }]',
+      '@return {void}'
+    ]
+  ])
+})
+
+test(`Destructuring parameters`, t => {
+  const comments = toComments(`
+    /**
+     * A function
+     */
+    export function test({ a }: { a: string }): void {
+      console.log(a)
+    }
+  `)
+
+  assertSimilarDocs(t, comments, [
+    [
+      'A function',
+      '@function',
+      '@name test',
+      '@param {{ a: string }} param1',
+      '@return {void}'
+    ]
+  ])
+})
+
+test(`Destructuring with defaults`, t => {
+  const comments = toComments(`
+    /**
+     * A function
+     * @return {void}
+     */
+    export function test({ a }?: { a: number} = { a: 1 }) {
+      console.log(a)
+    }
+  `)
+
+  assertSimilarDocs(t, comments, [
+    [
+      'A function',
+      '@function',
+      '@name test',
+      '@param {{ a: number }} [param1 = { a: 1 }]',
+      '@return {void}'
     ]
   ])
 })

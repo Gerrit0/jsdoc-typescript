@@ -88,7 +88,7 @@ const typeMap = new Map<SyntaxKind, string>([
 ])
 
 export function getType(node: TypeNode | TypeElement | undefined): string {
-  if (!node) return '?'
+  if (!node || !node.kind) return '?'
 
   const primitiveType = typeMap.get(node.kind)
   if (primitiveType) return primitiveType
@@ -111,6 +111,12 @@ export function getType(node: TypeNode | TypeElement | undefined): string {
 
   console.log('Unknown type', ts.SyntaxKind[node.kind], node)
   return '?'
+}
+
+export function printNode(node: ts.Node) {
+  const file = ts.createSourceFile('file.ts', '', ts.ScriptTarget.ESNext)
+  const printer = ts.createPrinter()
+  return printer.printNode(ts.EmitHint.Unspecified, node, file)
 }
 
 export function createDocComment(lines: string[]): string {
