@@ -16,20 +16,22 @@ const createComment = (node: ts.Node) => {
   return []
 }
 
-import createCommentForFunction from './function'
+import { createCommentForFunction } from './function'
 types.push( { test: ts.isFunctionLike, handle: createCommentForFunction })
 
-import createCommentForInterface from './interface'
+import { createCommentForInterface } from './interface'
 types.push({ test: ts.isInterfaceDeclaration, handle: createCommentForInterface })
 
-import createCommentForModule from './module'
+import { createCommentForModule } from './module'
 types.push({ test: ts.isModuleDeclaration, handle: createCommentForModule })
 
-import createCommentForType from './type'
+import { createCommentForType } from './type'
 types.push({ test: ts.isTypeAliasDeclaration, handle: createCommentForType })
 
+import { createCommentForVariable } from './variable'
+types.push({ test: ts.isVariableDeclaration, handle: createCommentForVariable })
 
-export default function getComments(source: ts.SourceFile): string[][] {
+export function getComments(source: ts.SourceFile): string[][] {
   const comments: string[][] = []
   const printer = ts.createPrinter()
 

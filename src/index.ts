@@ -1,5 +1,5 @@
 import * as ts from 'typescript'
-import getComments from './comments'
+import { getComments } from './comments'
 import { createDocComment } from './utils'
 
 export const handlers = {

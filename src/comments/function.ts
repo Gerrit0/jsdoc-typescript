@@ -5,9 +5,7 @@ import createParamTag from './tags/paramTag'
 import createReturnTag from './tags/returnTag'
 import createGenericTag from './tags/genericTag'
 
-// TODO: If a param is not documented with @param it will be lost.
-
-export default function getCommentForFunction(node: ts.FunctionLike & HasJSDoc): string[] {
+export function createCommentForFunction(node: ts.FunctionLike & HasJSDoc): string[] {
   if (!node.name || !ts.isIdentifier(node.name)) {
     Logger.warn('Non identifier for function name. Not sure how to handle. Skipping.')
     return []

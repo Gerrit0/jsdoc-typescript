@@ -1,7 +1,7 @@
 import test, { TestContext } from 'ava'
 import * as ts from 'typescript'
 
-import getComments from './comments'
+import { getComments } from './comments'
 
 function assertSimilarDocs(t: TestContext, result: string[][], expected: string[][]) {
   // comments, @param must be in the same order, otherwise it doesn't matter
@@ -395,3 +395,4 @@ test(`Destructuring with defaults`, t => {
     ]
   ])
 })
+

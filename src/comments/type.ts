@@ -11,7 +11,7 @@ function isSimpleType(node: ts.Node): boolean {
   )
 }
 
-export default function createCommentFromType(node: ts.TypeAliasDeclaration & HasJSDoc): string[] {
+export function createCommentForType(node: ts.TypeAliasDeclaration & HasJSDoc): string[] {
   const lines: string[] = [
     ...getComments(node),
     ...getTags(node).map(createGenericTag)
