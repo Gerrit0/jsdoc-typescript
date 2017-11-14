@@ -1,21 +1,21 @@
 import * as ts from 'typescript'
-import { getName, getComments, getTags, Logger, HasJSDoc } from '../utils'
+import { getName, getComments, getTags } from '../utils'
 
 import { createParamTag } from './tags/paramTag'
 import { createReturnTag } from './tags/returnTag'
 import { createGenericTag } from './tags/genericTag'
 
-export function createCommentForFunction(node: ts.FunctionLike & HasJSDoc): string[] {
-  if (!node.name || !ts.isIdentifier(node.name)) {
-    Logger.warn('Non identifier for function name. Not sure how to handle. Skipping.')
-    return []
-  }
-
+export function createCommentForFunction(node: ts.FunctionLike): string[] {
   const lines: string[] = [
     ...getComments(node),
     '@function',
-    `@name ${getName(node.name)}`
   ]
+
+  // If a function is defined as a variable, it might not have a name
+  // var f = () => {} <-- no name
+  if (node.name && ts.isIdentifier(node.name)) {
+    lines.push(`@name ${getName(node.name)}`)
+  }
 
   for (let tag of getTags(node)) {
     switch (tag.tagName.text) {

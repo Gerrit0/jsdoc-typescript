@@ -76,6 +76,9 @@ export function hasJSDoc<T extends ts.Node>(node: T): node is HasJSDoc & T {
 }
 
 const typeMap = new Map<SyntaxKind, string>([
+  [SyntaxKind.Unknown, '?'],
+  [SyntaxKind.NumericLiteral, 'number'],
+  [SyntaxKind.StringLiteral, 'string'],
   [SyntaxKind.NullKeyword, 'null'],
   [SyntaxKind.VoidKeyword, 'void'],
   [SyntaxKind.AnyKeyword, '*'],
@@ -86,6 +89,10 @@ const typeMap = new Map<SyntaxKind, string>([
   [SyntaxKind.UndefinedKeyword, 'undefined'],
   [SyntaxKind.FunctionDeclaration, 'function'],
 ])
+
+export function getTypeFromKind(kind: ts.SyntaxKind): string {
+  return typeMap.get(kind) || '?'
+}
 
 export function getType(node: TypeNode | TypeElement | undefined): string {
   if (!node || !node.kind) return '?'
@@ -125,10 +132,14 @@ export function createDocComment(lines: string[]): string {
   return '/**\n * ' + lines.join('\n * ') + '\n */'
 }
 
-export function getTags(node: HasJSDoc): ts.JSDocPropertyLikeTag[] {
+export function getTags(node: ts.Node): ts.JSDocPropertyLikeTag[] {
+  if (!hasJSDoc(node)) return []
+
   return flatten(pluckExisting(node.jsDoc, 'tags') as ts.NodeArray<ts.JSDocPropertyLikeTag>[])
 }
 
-export function getComments(node: HasJSDoc): string[] {
+export function getComments(node: ts.Node): string[] {
+  if (!hasJSDoc(node)) return []
+
   return pluckExisting(node.jsDoc, 'comment') as string[]
 }

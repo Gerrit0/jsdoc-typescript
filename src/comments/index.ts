@@ -29,7 +29,7 @@ import { createCommentForType } from './type'
 types.push({ test: ts.isTypeAliasDeclaration, handle: createCommentForType })
 
 import { createCommentForVariable } from './variable'
-types.push({ test: ts.isVariableDeclaration, handle: createCommentForVariable })
+types.push({ test: ts.isVariableStatement, handle: createCommentForVariable })
 
 export function getComments(source: ts.SourceFile): string[][] {
   const comments: string[][] = []

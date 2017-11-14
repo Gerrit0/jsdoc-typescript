@@ -4,15 +4,6 @@ import * as ts from 'typescript'
 import { getComments } from './comments'
 
 function assertSimilarDocs(t: TestContext, result: string[][], expected: string[][]) {
-  // comments, @param must be in the same order, otherwise it doesn't matter
-
-  // There must be the same number of tags
-  if (result.length < expected.length) {
-    t.fail('Missing tag')
-  } else if (result.length > expected.length) {
-    t.fail('Extra tag')
-  }
-
   // Surrounding whitespace doesn't matter
   result = result.sort()
     .map(comment => comment
@@ -424,3 +415,60 @@ test(`Array parameters`, t => {
   ])
 })
 
+test(`Exported variables`, t => {
+  const comments = toComments(`
+    /**
+     * An exported number
+     */
+    export const n = 1
+    /**
+     * An exported string
+     */
+    export let s = 'hi'
+    /**
+     * An exported object
+     */
+    export const o = { a: 1 }
+    /**
+     * An exported function variable
+     */
+    export const f = (): void => { console.log('Run') }
+  `)
+
+  assertSimilarDocs(t, comments, [
+    [
+      'An exported number',
+      '@member {number} n'
+    ],
+    [
+      'An exported string',
+      '@member {string} s'
+    ],
+    [
+      'An exported object',
+      '@member {{ a: number }} o'
+    ],
+    [
+      'An exported function variable',
+      '@name f',
+      '@function',
+      '@return {void}'
+    ]
+  ])
+})
+
+test(`Multiple exported variables using commas`, t => {
+  const comments = toComments(`
+    /**
+     * An exported number
+     */
+    export const n = 1, n2 = 2
+  `)
+
+  assertSimilarDocs(t, comments, [
+    [
+      'An exported number',
+      '@member {number} n'
+    ],
+  ])
+})

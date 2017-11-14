@@ -72,6 +72,10 @@ export namespace A {
 }
 ```
 
+### Implementation notes
+
+- Exporting multiple variables in one statement (that is, `export var a = 1, b = 2` will only result in `a` being documented)
+
 ### Frequently Asked Questions
 
 1. Documentation is missing for a function - how do I make the plugin see it?
