@@ -23,27 +23,7 @@ function assertSimilarDocs(t: TestContext, result: string[][], expected: string[
       .map(line => line.trim())
     )
 
-  result.forEach((comment, index) => {
-    const expectedComment = expected[index]
-    t.truthy(expectedComment, 'Missing comment')
-
-    // Comments must be first and in the same order
-    let i = 0
-    while (!expectedComment[i].startsWith('@')) {
-      t.is(comment[i], expectedComment[i])
-      i++
-    }
-
-    // Tags can be in any order, but the relative order of @param tags must be the same
-    // Assume that there are no duplicate tags (should never be the case anyways)
-    const expectedTags = expectedComment.slice(i)
-    const actualTags = comment.slice(i)
-
-    expectedTags.forEach((tag, tagIndex) => {
-      t.is(actualTags[tagIndex], tag)
-    })
-
-  })
+  t.deepEqual(result, expected)
 }
 
 function toComments(source: string): string[][] {
@@ -368,7 +348,8 @@ test(`Destructuring parameters`, t => {
       'A function',
       '@function',
       '@name test',
-      '@param {{ a: string }} param1',
+      '@param {Object} param1',
+      '@param {string} param1.a',
       '@return {void}'
     ]
   ])
@@ -390,7 +371,54 @@ test(`Destructuring with defaults`, t => {
       'A function',
       '@function',
       '@name test',
-      '@param {{ a: number }} [param1 = { a: 1 }]',
+      '@param {Object} [param1 = { a: 1 }]',
+      '@param {number} param1.a',
+      '@return {void}'
+    ]
+  ])
+})
+
+test(`Destructuring with defaults 2`, t => {
+  const comments = toComments(`
+    /**
+     * A function
+     * @return {void}
+     */
+    export function test({ a = 1, b: { c = 3 } = {} } : { a?: number, b?: { c: number } } = {}) {
+      console.log(a, c)
+    }
+  `)
+
+  assertSimilarDocs(t, comments, [
+    [
+      'A function',
+      '@function',
+      '@name test',
+      '@param {Object} [param1 = {}]',
+      '@param {number} [param1.a = 1]',
+      '@param {Object} [param1.b = {}]',
+      '@param {number} [param1.b.c = 3]',
+      '@return {void}'
+    ]
+  ])
+})
+
+test(`Array parameters`, t => {
+  const comments = toComments(`
+    /**
+     * A function
+     */
+    export function test(a: string[]): void {
+      console.log(...a)
+    }
+  `)
+
+  assertSimilarDocs(t, comments, [
+    [
+      'A function',
+      '@function',
+      '@name test',
+      '@param {Array.<string>} a',
       '@return {void}'
     ]
   ])

@@ -93,6 +93,8 @@ export function getType(node: TypeNode | TypeElement | undefined): string {
   const primitiveType = typeMap.get(node.kind)
   if (primitiveType) return primitiveType
 
+  if (ts.isArrayTypeNode(node)) return `Array.<${getType(node.elementType)}>`
+
   if (ts.isTypeReferenceNode(node)) return `${getName(node.typeName)}`
 
   if (ts.isUnionTypeNode(node)) return node.types.map(getType).join(' | ')

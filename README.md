@@ -30,9 +30,9 @@ Add it to your `jsdoc.json` and modify the `includePattern` to pick up Typescrip
 - Support for converting Typescript `interface` into JSDoc `@typedef` when generating documentation.
 - Support for converting Typescript `namespace` into JSDoc `@namespace` and adding required `@memberof` tag to all method declarations in the namespace.
 - Support for automatically adding type declarations to the minimal `@param param - description` syntax used by Typescript.
-- Support for documenting `type = string | number`. This will work for most basic types, and for type references, but not for `type = string | () => string`.
+- Support for documenting `type = string | number`. This will work for basic types and for type references, but not for `type = string | () => string`.
 - Support for documenting optional parameters with object types correctly.
-- Partial support for destructuring arguments (`func({a}: {a: number} = {a: 1})` is supported but `func({ a = 1 }: { a?: number } = {})` is not yet supported.)
+- Support for documenting destructured parameters. (Adding comments for destructured arguments is not yet supported)
 
 ### Planned Features
 

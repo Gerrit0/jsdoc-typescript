@@ -32,7 +32,7 @@ export function createCommentForFunction(node: ts.FunctionLike & HasJSDoc): stri
   node.parameters.forEach((param, index) => {
     const name = ts.isIdentifier(param.name) ? param.name.text : `param${index + 1}`
     const tag = getTags(node).find(tag => tag.name && ts.isIdentifier(tag.name) && tag.name.text === name)
-    lines.push(createParamTag(name, param, tag))
+    lines.push(...createParamTag(name, param, tag))
   })
 
   lines.push(createReturnTag(node, getTags(node).find(tag => tag.tagName.text === 'return')))
