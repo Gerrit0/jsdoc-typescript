@@ -1,11 +1,9 @@
 import * as ts from 'typescript'
 import { HasJSDoc, getComments, getTags } from '../utils'
 
-import createGenericTag from './tags/genericTag'
+import { createGenericTag } from './tags/genericTag'
 
-type Declaration = HasJSDoc & ts.VariableDeclaration
-
-export function createCommentForVariable(node: Declaration): string[] {
+export function createCommentForVariable(node: ts.VariableDeclaration & HasJSDoc): string[] {
   const lines: string[] = [
     ...getComments(node),
   ]

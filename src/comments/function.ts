@@ -1,9 +1,9 @@
 import * as ts from 'typescript'
 import { getName, getComments, getTags, Logger, HasJSDoc } from '../utils'
 
-import createParamTag from './tags/paramTag'
-import createReturnTag from './tags/returnTag'
-import createGenericTag from './tags/genericTag'
+import { createParamTag } from './tags/paramTag'
+import { createReturnTag } from './tags/returnTag'
+import { createGenericTag } from './tags/genericTag'
 
 export function createCommentForFunction(node: ts.FunctionLike & HasJSDoc): string[] {
   if (!node.name || !ts.isIdentifier(node.name)) {

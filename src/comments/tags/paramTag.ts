@@ -110,7 +110,7 @@ function getParamsForDestructuring(name: string, param: ts.ParameterDeclaration)
   return lines
 }
 
-export default function createParamTag(name: string, param: ts.ParameterDeclaration, tag?: ts.JSDocPropertyLikeTag): string[] {
+export function createParamTag(name: string, param: ts.ParameterDeclaration, tag?: ts.JSDocPropertyLikeTag): string[] {
 
   const lines: string[] = []
 

@@ -1,6 +1,6 @@
 import * as ts from 'typescript'
 import { getComments, HasJSDoc, getTags, hasJSDoc, Logger, getType } from '../utils'
-import createGenericTag from './tags/genericTag'
+import { createGenericTag } from './tags/genericTag'
 
 export function createCommentForInterface(node: ts.InterfaceDeclaration & HasJSDoc): string[] {
   const lines: string[] = [
