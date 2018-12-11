@@ -1,5 +1,7 @@
 ## jsdoc-typescript
 
+### Unsupported. Use [TypeDoc](https://typedoc.org/) or [ApiExtractor](https://github.com/Microsoft/web-build-tools/wiki/API-Extractor)
+
 A JSDoc 3 plugin for use with Typescript projects.
 
 This is a work in progress. Most projects will only be partially documented.
@@ -81,7 +83,3 @@ export namespace A {
 1. Documentation is missing for a function - how do I make the plugin see it?
 
 Make sure that the function is exported **and** has a JSDoc comment. If the function isn't exported, or does not have documentation associated with it, it will not be documented.
-
-2. This doesn't work for `Feature X` can you fix it?
-
-I plan to keep this module up to date with Typescript to ensure that all new features are properly supported. If you find something that is broken please feel free to raise an issue or submit a pull request with tests for the feature.
